@@ -730,10 +730,10 @@ class browser extends uploader {
     protected function sendDefaultThumb($file=null) {
         if ($file !== null) {
             $ext = file::getExtension($file);
-            $thumb = "themes/{$this->config['theme']}/img/files/big/$ext.png";
+            $thumb = dirname(__FILE__) . "/../../themes/{$this->config['theme']}/img/files/big/$ext.png";
         }
         if (!isset($thumb) || !file_exists($thumb))
-            $thumb = "themes/{$this->config['theme']}/img/files/big/..png";
+            $thumb = dirname(__FILE__) . "/../../themes/{$this->config['theme']}/img/files/big/..png";
         header("Content-Type: image/png");
         readfile($thumb);
         die;
@@ -773,8 +773,8 @@ class browser extends uploader {
             if ($stat === false) continue;
             $name = basename($file);
             $ext = file::getExtension($file);
-            $bigIcon = file_exists("themes/{$this->config['theme']}/img/files/big/$ext.png");
-            $smallIcon = file_exists("themes/{$this->config['theme']}/img/files/small/$ext.png");
+            $bigIcon = file_exists(dirname(__FILE__) . "/../../themes/{$this->config['theme']}/img/files/big/$ext.png");
+            $smallIcon = file_exists(dirname(__FILE__) . "/../../themes/{$this->config['theme']}/img/files/small/$ext.png");
             $thumb = file_exists("$thumbDir/$name");
             $return[] = array(
                 'name' => stripcslashes($name),
