@@ -918,5 +918,3 @@ class browser extends uploader {
         return htmlentities($str, null, strtoupper($this->charset));
     }
 }
-
-?>

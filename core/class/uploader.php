@@ -813,5 +813,3 @@ if (window.opener) window.close();
         return file_get_contents("conf/upload.htaccess");
     }
 }
-
-?>
