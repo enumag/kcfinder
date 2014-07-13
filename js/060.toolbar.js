@@ -301,9 +301,9 @@ _.refresh = function(selected) {
             _.orderFiles(null, selected);
             _.statusDir();
         },
-        error: function() {
+        error: function(jqXHR, status, error) {
             $('#files > div').css({opacity: "", filter: ""});
-            $('#files').html(_.label("Unknown error."));
+            $('#files').html(_.debugMode ? error : _.label("Unknown error."));
         }
     });
 };

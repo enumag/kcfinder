@@ -150,8 +150,8 @@ _.fileNameDialog = function(post, inputName, inputValue, url, labels, callBack, 
                     if (callBack) callBack(data);
                     dlg.dialog("destroy").detach();
                 },
-                error: function() {
-                    _.alert(_.label("Unknown error."));
+                error: function(jqXHR, status, error) {
+                    _.alert(_.debugMode ? error : _.label("Unknown error."));
                 }
             });
             return false;

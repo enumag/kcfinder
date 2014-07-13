@@ -23,12 +23,8 @@ spl_autoload_register(function($path) {
     if ($ns == "kcfinder") {
 		$dir = dirname(__FILE__);
 
-        if ($class == "uploader")
-            require $dir . "/../core/class/uploader.php";
-        elseif ($class == "browser")
-            require $dir . "/../core/class/browser.php";
-        elseif ($class == "minifier")
-            require $dir . "/../core/class/minifier.php";
+        if (in_array($class, array('uploader', 'browser', 'minifier', 'Exception')))
+            require $dir . "/../core/class/$class.php";
 
         elseif (file_exists($dir . "/../core/types/$class.php"))
             require $dir . "/../core/types/$class.php";

@@ -51,7 +51,7 @@ class browser extends uploader {
                 )
             )
         )
-            $this->errorMsg("Cannot access or create thumbnails folder.");
+            throw new Exception("Cannot access or create thumbnails folder.");
 
         $this->thumbsDir = $thumbsDir;
         $this->thumbsTypeDir = "$thumbsDir/{$this->type}";
@@ -119,7 +119,15 @@ class browser extends uploader {
         )
             header("Content-Type: text/plain; charset={$this->charset}");
 
-        $return = $this->$method();
+		try {
+        	$return = $this->$method();
+        } catch (Exception $e) {
+        	if (!$this->config['debugMode']) {
+				$this->errorMsg($e->getMessage());
+			} else {
+				throw new Exception($e->getMessage, $e->getCode(), $e);
+			}
+		}
         echo ($return === true)
             ? '{}'
             : $return;
@@ -210,20 +218,20 @@ class browser extends uploader {
             !isset($_POST['newDir']) ||
             !$this->checkFilename($_POST['newDir'])
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $dir = $this->postDir();
         $newDir = $this->normalizeDirname(trim($_POST['newDir']));
         if (!strlen($newDir))
-            $this->errorMsg("Please enter new folder name.");
+            throw new Exception("Please enter new folder name.");
         if (preg_match('/[\/\\\\]/s', $newDir))
-            $this->errorMsg("Unallowable characters in folder name.");
+            throw new Exception("Unallowable characters in folder name.");
         if (substr($newDir, 0, 1) == ".")
-            $this->errorMsg("Folder name shouldn't begins with '.'");
+            throw new Exception("Folder name shouldn't begins with '.'");
         if (file_exists("$dir/$newDir"))
-            $this->errorMsg("A file or folder with that name already exists.");
+            throw new Exception("A file or folder with that name already exists.");
         if (!@mkdir("$dir/$newDir", $this->config['dirPerms']))
-            $this->errorMsg("Cannot create {dir} folder.", array('dir' => $this->htmlData($newDir)));
+            throw new Exception("Cannot create {dir} folder.", array('dir' => $this->htmlData($newDir)));
         return true;
     }
 
@@ -234,18 +242,18 @@ class browser extends uploader {
             !isset($_POST['newName']) ||
             !$this->checkFilename($_POST['newName'])
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $dir = $this->postDir();
         $newName = $this->normalizeDirname(trim($_POST['newName']));
         if (!strlen($newName))
-            $this->errorMsg("Please enter new folder name.");
+            throw new Exception("Please enter new folder name.");
         if (preg_match('/[\/\\\\]/s', $newName))
-            $this->errorMsg("Unallowable characters in folder name.");
+            throw new Exception("Unallowable characters in folder name.");
         if (substr($newName, 0, 1) == ".")
-            $this->errorMsg("Folder name shouldn't begins with '.'");
+            throw new Exception("Folder name shouldn't begins with '.'");
         if (!@rename($dir, dirname($dir) . "/$newName"))
-            $this->errorMsg("Cannot rename the folder.");
+            throw new Exception("Cannot rename the folder.");
         $thumbDir = "$this->thumbsTypeDir/{$_POST['dir']}";
         if (is_dir($thumbDir))
             @rename($thumbDir, dirname($thumbDir) . "/$newName");
@@ -257,15 +265,15 @@ class browser extends uploader {
             !isset($_POST['dir']) ||
             !strlen(rtrim(rtrim(trim($_POST['dir']), "/"), "\\"))
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $dir = $this->postDir();
 
         if (!dir::isWritable($dir))
-            $this->errorMsg("Cannot delete the folder.");
+            throw new Exception("Cannot delete the folder.");
         $result = !dir::prune($dir, false);
         if (is_array($result) && count($result))
-            $this->errorMsg("Failed to delete {count} files/folders.",
+            throw new Exception("Failed to delete {count} files/folders.",
                 array('count' => count($result)));
         $thumbDir = "$this->thumbsTypeDir/{$_POST['dir']}";
         if (is_dir($thumbDir)) dir::prune($thumbDir);
@@ -278,12 +286,12 @@ class browser extends uploader {
         if (!$this->config['access']['files']['upload'] ||
             !isset($_POST['dir'])
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $dir = $this->postDir();
 
         if (!dir::isWritable($dir))
-            $this->errorMsg("Cannot access or write to upload folder.");
+            throw new Exception("Cannot access or write to upload folder.");
 
         if (is_array($this->file['name'])) {
             $return = array();
@@ -307,7 +315,7 @@ class browser extends uploader {
             (false === ($file = "$dir/{$_POST['file']}")) ||
             !file_exists($file) || !is_readable($file)
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         header("Pragma: public");
         header("Expires: 0");
@@ -332,7 +340,7 @@ class browser extends uploader {
             (false === ($file = "$dir/{$_POST['file']}")) ||
             !file_exists($file) || !is_readable($file) || !file::isWritable($file)
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         if (isset($this->config['denyExtensionRename']) &&
             $this->config['denyExtensionRename'] &&
@@ -340,23 +348,23 @@ class browser extends uploader {
                 file::getExtension($_POST['newName'], true)
             )
         )
-            $this->errorMsg("You cannot rename the extension of files!");
+            throw new Exception("You cannot rename the extension of files!");
 
         $newName = $this->normalizeFilename(trim($_POST['newName']));
         if (!strlen($newName))
-            $this->errorMsg("Please enter new file name.");
+            throw new Exception("Please enter new file name.");
         if (preg_match('/[\/\\\\]/s', $newName))
-            $this->errorMsg("Unallowable characters in file name.");
+            throw new Exception("Unallowable characters in file name.");
         if (substr($newName, 0, 1) == ".")
-            $this->errorMsg("File name shouldn't begins with '.'");
+            throw new Exception("File name shouldn't begins with '.'");
         $newName = "$dir/$newName";
         if (file_exists($newName))
-            $this->errorMsg("A file or folder with that name already exists.");
+            throw new Exception("A file or folder with that name already exists.");
         $ext = file::getExtension($newName);
         if (!$this->validateExtension($ext, $this->type))
-            $this->errorMsg("Denied file extension.");
+            throw new Exception("Denied file extension.");
         if (!@rename($file, $newName))
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $thumbDir = "{$this->thumbsTypeDir}/{$_POST['dir']}";
         $thumbFile = "$thumbDir/{$_POST['file']}";
@@ -376,7 +384,7 @@ class browser extends uploader {
             !file_exists($file) || !is_readable($file) || !file::isWritable($file) ||
             !@unlink($file)
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $thumb = "{$this->thumbsTypeDir}/{$_POST['dir']}/{$_POST['file']}";
         if (file_exists($thumb)) @unlink($thumb);
@@ -391,7 +399,7 @@ class browser extends uploader {
             !isset($_POST['files']) || !is_array($_POST['files']) ||
             !count($_POST['files'])
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $error = array();
         foreach($_POST['files'] as $file) {
@@ -443,7 +451,7 @@ class browser extends uploader {
             !isset($_POST['files']) || !is_array($_POST['files']) ||
             !count($_POST['files'])
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $error = array();
         foreach($_POST['files'] as $file) {
@@ -493,7 +501,7 @@ class browser extends uploader {
             !is_array($_POST['files']) ||
             !count($_POST['files'])
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $error = array();
         foreach($_POST['files'] as $file) {
@@ -523,7 +531,7 @@ class browser extends uploader {
     protected function act_downloadDir() {
         $dir = $this->postDir();
         if (!isset($_POST['dir']) || $this->config['denyZipDownload'])
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
         $filename = basename($dir) . ".zip";
         do {
             $file = md5(time() . session_id());
@@ -545,7 +553,7 @@ class browser extends uploader {
             !is_array($_POST['files']) ||
             $this->config['denyZipDownload']
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $zipFiles = array();
         foreach ($_POST['files'] as $file) {
@@ -583,7 +591,7 @@ class browser extends uploader {
             !is_array($_POST['files']) ||
             $this->config['denyZipDownload']
         )
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
 
         $zipFiles = array();
         foreach ($_POST['files'] as $file) {
@@ -824,9 +832,9 @@ class browser extends uploader {
         if (isset($_POST['dir']))
             $dir .= "/" . $_POST['dir'];
         if (!$this->checkFilePath($dir))
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
         if ($existent && (!is_dir($dir) || !is_readable($dir)))
-            $this->errorMsg("Inexistant or inaccessible folder.");
+            throw new Exception("Inexistant or inaccessible folder.");
         return $dir;
     }
 
@@ -835,9 +843,9 @@ class browser extends uploader {
         if (isset($_GET['dir']))
             $dir .= "/" . $_GET['dir'];
         if (!$this->checkFilePath($dir))
-            $this->errorMsg("Unknown error.");
+            throw new Exception("Unknown error.");
         if ($existent && (!is_dir($dir) || !is_readable($dir)))
-            $this->errorMsg("Inexistant or inaccessible folder.");
+            throw new Exception("Inexistant or inaccessible folder.");
         return $dir;
     }
 

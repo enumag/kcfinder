@@ -126,9 +126,9 @@ _.expandDir = function(dir) {
                         _.initFolders();
                         _.initDropUpload();
                     },
-                    error: function() {
+                    error: function(jqXHR, status, error) {
                         $('#loadingDirs').detach();
-                        _.alert(_.label("Unknown error."));
+                        _.alert(_.debugMode ? error : _.label("Unknown error."));
                     }
                 });
             });
@@ -157,8 +157,8 @@ _.changeDir = function(dir) {
                 _.setTitle("KCFinder: /" + _.dir);
                 _.statusDir();
             },
-            error: function() {
-                $('#files').html(_.label("Unknown error."));
+            error: function(jqXHR, status, error) {
+                $('#files').html(_.debugMode ? error : _.label("Unknown error."));
             }
         });
     }

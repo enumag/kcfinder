@@ -190,13 +190,13 @@ _.menuFile = function(file, e) {
                             _.check4errors(data);
                             _.refresh();
                         },
-                        error: function() {
+                        error: function(jqXHR, status, error) {
                             if (callBack) callBack();
                             $('#files > div').css({
                                 opacity: "",
                                 filter: ""
                             });
-                            _.alert(_.label("Unknown error."));
+                            _.alert(_.debugMode ? error : _.label("Unknown error."));
                         }
                     });
                 };
@@ -317,9 +317,9 @@ _.menuFile = function(file, e) {
                                     return;
                                 _.refresh();
                             },
-                            error: function() {
+                            error: function(jqXHR, status, error) {
                                 if (callBack) callBack();
-                                _.alert(_.label("Unknown error."));
+                                _.alert(_.debugMode ? error : _.label("Unknown error."));
                             }
                         });
                     }
@@ -460,9 +460,9 @@ _.menuDir = function(dir, e) {
                                 _.initDropUpload();
                             });
                         },
-                        error: function() {
+                        error: function(jqXHR, status, error) {
                             if (callBack) callBack();
-                            _.alert(_.label("Unknown error."));
+                            _.alert(_.debugMode ? error : _.label("Unknown error."));
                         }
                     });
                 }

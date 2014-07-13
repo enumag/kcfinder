@@ -29,6 +29,7 @@ _.uploadURL = "<?php echo text::jsValue($this->config['uploadURL']) ?>";
 _.thumbsURL = _.uploadURL + "/<?php echo text::jsValue($this->config['thumbsDir']) ?>";
 _.opener = <?php echo json_encode($this->opener) ?>;
 _.cms = "<?php echo text::jsValue($this->cms) ?>";
+_.debugMode = <?php echo $this->config['debugMode'] ? 'true' : 'false' ?>;
 $.$.kuki.domain = "<?php echo text::jsValue($this->config['cookieDomain']) ?>";
 $.$.kuki.path = "<?php echo text::jsValue($this->config['cookiePath']) ?>";
 $.$.kuki.prefix = "<?php echo text::jsValue($this->config['cookiePrefix']) ?>";

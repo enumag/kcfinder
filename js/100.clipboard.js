@@ -85,13 +85,13 @@ _.copyClipboard = function(dir) {
                 if (dir == _.dir)
                     _.refresh();
             },
-            error: function() {
+            error: function(jqXHR, status, error) {
                 if (callBack) callBack();
                 $('#files > div').css({
                     opacity: "",
                     filter: ""
                 });
-                _.alert(_.label("Unknown error."));
+                _.alert(_.debugMode ? error : _.label("Unknown error."));
             }
         });
     };
@@ -134,13 +134,13 @@ _.moveClipboard = function(dir) {
                 _.clearClipboard();
                 _.refresh();
             },
-            error: function() {
+            error: function(jqXHR, status, error) {
                 if (callBack) callBack();
                 $('#files > div').css({
                     opacity: "",
                     filter: ""
                 });
-                _.alert(_.label("Unknown error."));
+                _.alert(_.debugMode ? error : _.label("Unknown error."));
             }
         });
     };
@@ -181,13 +181,13 @@ _.deleteClipboard = function() {
                 _.clearClipboard();
                 _.refresh();
             },
-            error: function() {
+            error: function(jqXHR, status, error) {
                 if (callBack) callBack();
                 $('#files > div').css({
                     opacity: "",
                     filter: ""
                 });
-                _.alert(_.label("Unknown error."));
+                _.alert(_.debugMode ? error : _.label("Unknown error."));
             }
         });
     };

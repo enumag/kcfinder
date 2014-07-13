@@ -140,9 +140,9 @@ _.initContent = function() {
             _.files = data.files ? data.files : [];
             _.orderFiles();
         },
-        error: function() {
-            $('div#folders').html(_.label("Unknown error."));
-            $('div#files').html(_.label("Unknown error."));
+        error: function(jqXHR, status, error) {
+            $('div#folders').html(_.debugMode ? error : _.label("Unknown error."));
+            $('div#files').html(_.debugMode ? error : _.label("Unknown error."));
         }
     });
 };
