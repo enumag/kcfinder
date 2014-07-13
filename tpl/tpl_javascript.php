@@ -1,8 +1,8 @@
 <?php
     NAMESPACE kcfinder;
 ?>
-<script src="js/index.php" type="text/javascript"></script>
-<script src="js_localize.php?lng=<?php echo $this->lang ?>" type="text/javascript"></script>
+<script src="<?php echo $this->config['baseUrl'] ?>js/index.php" type="text/javascript"></script>
+<script src="<?php echo $this->config['baseUrl'] ?>js_localize.php?lng=<?php echo $this->lang ?>" type="text/javascript"></script>
 <?php
     IF ($this->opener['name'] == "tinymce"):
 ?>
@@ -12,7 +12,7 @@
 
     IF (file_exists("themes/{$this->config['theme']}/js.php")):
 ?>
-<script src="themes/<?php echo $this->config['theme'] ?>/js.php" type="text/javascript"></script>
+<script src="<?php echo $this->config['baseUrl'] ?>themes/<?php echo $this->config['theme'] ?>/js.php" type="text/javascript"></script>
 <?php
     ENDIF;
 ?>

@@ -94,7 +94,7 @@ class uploader {
         return property_exists($this, $property) ? $this->$property : null;
     }
 
-    public function __construct() {
+    public function __construct($config = NULL) {
 
         // SET CMS INTEGRATION PROPERTY
         if (isset($_GET['cms']) &&
@@ -107,59 +107,67 @@ class uploader {
         if (count($_FILES))
             $this->file = &$_FILES[key($_FILES)];
 
-        // LOAD DEFAULT CONFIGURATION
-        require "conf/config.php";
+		// LOAD DEFAULT CONFIGURATION
+		require dirname(__FILE__) . "/../../conf/config.php";
 
-        // SETTING UP SESSION
-        if (!session_id()) {
-            if (isset($_CONFIG['_sessionLifetime']))
-                ini_set('session.gc_maxlifetime', $_CONFIG['_sessionLifetime'] * 60);
-            if (isset($_CONFIG['_sessionDir']))
-                ini_set('session.save_path', $_CONFIG['_sessionDir']);
-            if (isset($_CONFIG['_sessionDomain']))
-                ini_set('session.cookie_domain', $_CONFIG['_sessionDomain']);
-            session_start();
-        }
+		if (is_array($config)) {
+			$this->config = $config + $_CONFIG;
 
-        // LOAD SESSION CONFIGURATION IF EXISTS
-        $this->config = $_CONFIG;
-        $sessVar = "_sessionVar";
-        if (isset($_CONFIG[$sessVar])) {
+			$this->session = &$_SESSION["_sessionVar"];
 
-            $sessVar = $_CONFIG[$sessVar];
+		} else {
 
-            if (!isset($_SESSION[$sessVar]))
-                $_SESSION[$sessVar] = array();
+			// SETTING UP SESSION
+			if (!session_id()) {
+				if (isset($_CONFIG['_sessionLifetime']))
+					ini_set('session.gc_maxlifetime', $_CONFIG['_sessionLifetime'] * 60);
+				if (isset($_CONFIG['_sessionDir']))
+					ini_set('session.save_path', $_CONFIG['_sessionDir']);
+				if (isset($_CONFIG['_sessionDomain']))
+					ini_set('session.cookie_domain', $_CONFIG['_sessionDomain']);
+				session_start();
+			}
 
-            $sessVar = &$_SESSION[$sessVar];
+			// LOAD SESSION CONFIGURATION IF EXISTS
+			$this->config = $_CONFIG;
+			$sessVar = "_sessionVar";
+			if (isset($_CONFIG[$sessVar])) {
 
-            if (!is_array($sessVar))
-                $sessVar = array();
+				$sessVar = $_CONFIG[$sessVar];
 
-            foreach ($sessVar as $key => $val)
-                if ((substr($key, 0, 1) != "_") && isset($_CONFIG[$key]))
-                    $this->config[$key] = $val;
+				if (!isset($_SESSION[$sessVar]))
+					$_SESSION[$sessVar] = array();
 
-            if (!isset($sessVar['self']))
-                $sessVar['self'] = array();
+				$sessVar = &$_SESSION[$sessVar];
 
-            $this->session = &$sessVar['self'];
+				if (!is_array($sessVar))
+					$sessVar = array();
 
-        } else
-            $this->session = &$_SESSION;
+				foreach ($sessVar as $key => $val)
+					if ((substr($key, 0, 1) != "_") && isset($_CONFIG[$key]))
+						$this->config[$key] = $val;
 
-        // SECURING THE SESSION
-        $stamp = array(
-            'ip' => $_SERVER['REMOTE_ADDR'],
-            'agent' => md5($_SERVER['HTTP_USER_AGENT'])
-        );
-        if (!isset($this->session['stamp']))
-            $this->session['stamp'] = $stamp;
-        elseif (!is_array($this->session['stamp']) || ($this->session['stamp'] !== $stamp)) {
-            if ($this->session['stamp']['ip'] === $stamp['ip'])
-                session_destroy();
-            die;
-        }
+				if (!isset($sessVar['self']))
+					$sessVar['self'] = array();
+
+				$this->session = &$sessVar['self'];
+
+			} else
+				$this->session = &$_SESSION;
+
+			// SECURING THE SESSION
+			$stamp = array(
+				'ip' => $_SERVER['REMOTE_ADDR'],
+				'agent' => md5($_SERVER['HTTP_USER_AGENT'])
+			);
+			if (!isset($this->session['stamp']))
+				$this->session['stamp'] = $stamp;
+			elseif (!is_array($this->session['stamp']) || ($this->session['stamp'] !== $stamp)) {
+				if ($this->session['stamp']['ip'] === $stamp['ip'])
+					session_destroy();
+				die;
+			}
+		}
 
         // IMAGE DRIVER INIT
         if (isset($this->config['imageDriversPriority'])) {
@@ -704,7 +712,7 @@ class uploader {
     }
 
     protected function localize($langCode) {
-        require "lang/{$langCode}.php";
+        require dirname(__FILE__) . "/../../lang/{$langCode}.php";
         setlocale(LC_ALL, $lang['_locale']);
         $this->charset = $lang['_charset'];
         $this->dateTimeFull = $lang['_dateTimeFull'];
@@ -810,6 +818,6 @@ if (window.opener) window.close();
     }
 
     protected function get_htaccess() {
-        return file_get_contents("conf/upload.htaccess");
+        return file_get_contents(dirname(__FILE__) . "/../../conf/upload.htaccess");
     }
 }

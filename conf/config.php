@@ -105,6 +105,7 @@ $_CONFIG = array(
     'cookiePath' => "",
     'cookiePrefix' => 'KCFINDER_',
 
+	'basePath' => "",
 
 // THE FOLLOWING SETTINGS CANNOT BE OVERRIDED WITH SESSION SETTINGS
 
