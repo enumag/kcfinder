@@ -125,7 +125,7 @@ class browser extends uploader {
         	if (!$this->config['debugMode']) {
 				$this->errorMsg($e->getMessage());
 			} else {
-				throw new Exception($e->getMessage, $e->getCode(), $e);
+				throw new Exception($e->getMessage(), $e->getCode(), $e);
 			}
 		}
         echo ($return === true)
