@@ -283,6 +283,14 @@ class uploader {
                 $this->lang = $_GET[$key];
                 break;
             }
+        
+		if (isset($this->config['lang']) &&
+			preg_match('/^[a-z][a-z\._\-]*$/i', $this->config['lang']) &&
+			file_exists(dirname(__FILE__) . "/../../lang/" . strtolower($this->config['lang']) . ".php")
+		) {
+			$this->lang = $this->config['lang'];
+		}
+        
         $this->localize($this->lang);
 
         // IF BROWSER IS ENABLED
