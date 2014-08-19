@@ -278,7 +278,7 @@ class uploader {
         foreach ($this->langInputNames as $key)
             if (isset($_GET[$key]) &&
                 preg_match('/^[a-z][a-z\._\-]*$/i', $_GET[$key]) &&
-                file_exists("lang/" . strtolower($_GET[$key]) . ".php")
+                file_exists(dirname(__FILE__) . "/../../lang/" . strtolower($_GET[$key]) . ".php")
             ) {
                 $this->lang = $_GET[$key];
                 break;
