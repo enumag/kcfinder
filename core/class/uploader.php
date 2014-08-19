@@ -392,8 +392,13 @@ class uploader {
         )
             $filename = strtr($filename, $this->config['filenameChangeChars']);
 
-        if (isset($this->config['_normalizeFilenames']) && $this->config['_normalizeFilenames'])
-            $filename = file::normalizeFilename($filename);
+        if (isset($this->config['_normalizeFilenames']) && $this->config['_normalizeFilenames']) {
+        	if (is_callable($this->config['_normalizeFilenames'])) {
+				$filename = call_user_func($this->config['_normalizeFilenames'], $filename);
+			} else {
+            	$filename = file::normalizeFilename($filename);
+            }
+        }
 
         return $filename;
     }
@@ -405,8 +410,13 @@ class uploader {
         )
             $dirname = strtr($dirname, $this->config['dirnameChangeChars']);
 
-        if (isset($this->config['_normalizeFilenames']) && $this->config['_normalizeFilenames'])
-            $dirname = file::normalizeFilename($dirname);
+        if (isset($this->config['_normalizeFilenames']) && $this->config['_normalizeFilenames']) {
+        	if (is_callable($this->config['_normalizeFilenames'])) {
+				$dirname = call_user_func($this->config['_normalizeFilenames'], $dirname);
+			} else {
+            	$dirname = file::normalizeFilename($dirname);
+            }
+        }
 
         return $dirname;
     }
