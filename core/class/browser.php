@@ -215,8 +215,7 @@ class browser extends uploader {
     protected function act_newDir() {
         if (!$this->config['access']['dirs']['create'] ||
             !isset($_POST['dir']) ||
-            !isset($_POST['newDir']) ||
-            !$this->checkFilename($_POST['newDir'])
+            !isset($_POST['newDir'])
         )
             throw new Exception("Unknown error.");
 
@@ -224,7 +223,7 @@ class browser extends uploader {
         $newDir = $this->normalizeDirname(trim($_POST['newDir']));
         if (!strlen($newDir))
             throw new Exception("Please enter new folder name.");
-        if (preg_match('/[\/\\\\]/s', $newDir))
+        if (!$this->checkFilename($newDir) || preg_match('/[\/\\\\]/s', $newDir))
             throw new Exception("Unallowable characters in folder name.");
         if (substr($newDir, 0, 1) == ".")
             throw new Exception("Folder name shouldn't begins with '.'");
@@ -239,8 +238,7 @@ class browser extends uploader {
         if (!$this->config['access']['dirs']['rename'] ||
             !isset($_POST['dir']) ||
             !strlen(rtrim(rtrim(trim($_POST['dir']), "/"), "\\")) ||
-            !isset($_POST['newName']) ||
-            !$this->checkFilename($_POST['newName'])
+            !isset($_POST['newName'])
         )
             throw new Exception("Unknown error.");
 
@@ -248,7 +246,7 @@ class browser extends uploader {
         $newName = $this->normalizeDirname(trim($_POST['newName']));
         if (!strlen($newName))
             throw new Exception("Please enter new folder name.");
-        if (preg_match('/[\/\\\\]/s', $newName))
+        if (!$this->checkFilename($newName) || preg_match('/[\/\\\\]/s', $newName))
             throw new Exception("Unallowable characters in folder name.");
         if (substr($newName, 0, 1) == ".")
             throw new Exception("Folder name shouldn't begins with '.'");
